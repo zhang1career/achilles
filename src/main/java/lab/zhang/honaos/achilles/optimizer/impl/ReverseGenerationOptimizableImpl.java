@@ -1,26 +1,26 @@
-package lab.zhang.honaos.achilles.compiler.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl;
 
-import lab.zhang.honaos.achilles.compiler.ast.TreeNode;
-import lab.zhang.honaos.achilles.compiler.context.IContext;
-import lab.zhang.honaos.achilles.compiler.optimizer.IOptimize;
+import lab.zhang.honaos.achilles.ast.TreeNode;
+import lab.zhang.honaos.achilles.context.Contextable;
+import lab.zhang.honaos.achilles.optimizer.Optimizable;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangrj
  */
-public class ReverseGenerationOptimizeImpl<V> implements IOptimize<V> {
+public class ReverseGenerationOptimizableImpl<V> implements Optimizable<V> {
 
     public static final String CONTEXT_OUTPUT_KEY = "rev_gen";
 
     @Override
-    public void optimize(TreeNode<V> root, IContext context) {
+    public void optimize(TreeNode<V> root, Contextable context) {
         context.put(CONTEXT_OUTPUT_KEY, new ConcurrentHashMap<TreeNode<V>, TreeNode<V>>());
         doTravel(root, context);
     }
 
 
-    private void doTravel(TreeNode<V> node, IContext context) {
+    private void doTravel(TreeNode<V> node, Contextable context) {
         if (node == null) {
             return;
         }

@@ -1,6 +1,6 @@
-package lab.zhang.honaos.achilles.compiler.context.impl;
+package lab.zhang.honaos.achilles.context.impl;
 
-import lab.zhang.honaos.achilles.compiler.context.IContext;
+import lab.zhang.honaos.achilles.context.Contextable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author zhangrj
  */
-public class ConcurrentHashMapContextImpl implements IContext {
+public class ConcurrentHashMapContextableImpl implements Contextable {
 
     private Map<Object, Object> valueMap;
 
-    public ConcurrentHashMapContextImpl() {
+    public ConcurrentHashMapContextableImpl() {
         this.valueMap = new ConcurrentHashMap<>();
     }
 

@@ -1,11 +1,11 @@
-package lab.zhang.honaos.achilles.compiler.context;
+package lab.zhang.honaos.achilles.context;
 
 import java.util.Map;
 
 /**
  * @author zhangrj
  */
-public interface IContext {
+public interface Contextable {
 
     void put(Object key, Object value);
 

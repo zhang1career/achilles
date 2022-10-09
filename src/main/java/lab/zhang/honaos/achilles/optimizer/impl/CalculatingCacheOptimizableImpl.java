@@ -1,9 +1,9 @@
-package lab.zhang.honaos.achilles.compiler.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl;
 
 import com.sun.tools.javac.util.Pair;
-import lab.zhang.honaos.achilles.compiler.ast.TreeNode;
-import lab.zhang.honaos.achilles.compiler.context.IContext;
-import lab.zhang.honaos.achilles.compiler.optimizer.IOptimize;
+import lab.zhang.honaos.achilles.ast.TreeNode;
+import lab.zhang.honaos.achilles.context.Contextable;
+import lab.zhang.honaos.achilles.optimizer.Optimizable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,21 +13,21 @@ import java.util.List;
 /**
  * @author zhangrj
  */
-public class CalculatingCacheOptimizeImpl<V> implements IOptimize<V> {
+public class CalculatingCacheOptimizableImpl<V> implements Optimizable<V> {
 
     public static final String CONTEXT_READ_KEY = "calc_cache_read";
 
     public static final String CONTEXT_WRITE_KEY = "calc_cache_write";
 
     @Override
-    public void optimize(TreeNode<V> root, IContext context) {
+    public void optimize(TreeNode<V> root, Contextable context) {
         context.put(CONTEXT_READ_KEY, new HashMap<TreeNode<V>, List<V>>());
         context.put(CONTEXT_WRITE_KEY, new HashMap<TreeNode<V>, Pair<List<V>, Integer>>());
         doTravel(root, null, 0, context);
     }
 
 
-    private void doTravel(TreeNode<V> node, TreeNode<V> parent, int indexFromParent, IContext context) {
+    private void doTravel(TreeNode<V> node, TreeNode<V> parent, int indexFromParent, Contextable context) {
         if (node == null) {
             return;
         }

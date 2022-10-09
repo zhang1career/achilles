@@ -1,11 +1,11 @@
-package lab.zhang.honaos.achilles.compiler.optimizer;
+package lab.zhang.honaos.achilles.optimizer;
 
 import com.sun.tools.javac.util.Pair;
-import lab.zhang.honaos.achilles.compiler.ast.TreeNode;
-import lab.zhang.honaos.achilles.compiler.context.IContext;
-import lab.zhang.honaos.achilles.compiler.optimizer.impl.CalculatingCacheOptimizeImpl;
-import lab.zhang.honaos.achilles.compiler.optimizer.impl.ParallelPruningOptimizeImpl;
-import lab.zhang.honaos.achilles.compiler.optimizer.impl.ReverseGenerationOptimizeImpl;
+import lab.zhang.honaos.achilles.ast.TreeNode;
+import lab.zhang.honaos.achilles.context.Contextable;
+import lab.zhang.honaos.achilles.optimizer.impl.CalculatingCacheOptimizableImpl;
+import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizableImpl;
+import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizableImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,10 +20,10 @@ public class OptimizeFilterTest {
 
     private OptimizeFilter<Integer> target;
 
-    private List<IOptimize<Integer>> optimizerList;
-    private IOptimize<Integer> calculatingCacheOptimizer;
-    private IOptimize<Integer> parallelPruningOptimizer;
-    private IOptimize<Integer> reverseGenerationOptimizer;
+    private List<Optimizable<Integer>> optimizerList;
+    private Optimizable<Integer> calculatingCacheOptimizer;
+    private Optimizable<Integer> parallelPruningOptimizer;
+    private Optimizable<Integer> reverseGenerationOptimizer;
 
     private TreeNode<Integer> node0;
     private TreeNode<Integer> node1;
@@ -35,23 +35,23 @@ public class OptimizeFilterTest {
     @Before
     public void setUp() {
         target = new OptimizeFilter<>();
-
-        calculatingCacheOptimizer = new CalculatingCacheOptimizeImpl<>();
-        parallelPruningOptimizer = new ParallelPruningOptimizeImpl<>();
-        reverseGenerationOptimizer = new ReverseGenerationOptimizeImpl<>();
-
+        // optimizer
+        calculatingCacheOptimizer = new CalculatingCacheOptimizableImpl<>();
+        parallelPruningOptimizer = new ParallelPruningOptimizableImpl<>();
+        reverseGenerationOptimizer = new ReverseGenerationOptimizableImpl<>();
+        // optimizer link
         optimizerList = new ArrayList<>();
         optimizerList.add(calculatingCacheOptimizer);
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
-
+        // tree node
         node0 = new TreeNode<>(0);
         node1 = new TreeNode<>(1);
         node2 = new TreeNode<>(2);
         node3 = new TreeNode<>(3);
         node4 = new TreeNode<>(4);
         node5 = new TreeNode<>(5);
-
+        // tree
         /**
          *     0
          *  /     \
@@ -70,16 +70,16 @@ public class OptimizeFilterTest {
 
     @Test
     public void test_filter() throws Exception {
-        IContext context = target.filter(node0, optimizerList);
+        Contextable context = target.filter(node0, optimizerList);
 
         // calculating cache
-        Object cacheReadObject = context.get(CalculatingCacheOptimizeImpl.CONTEXT_READ_KEY);
+        Object cacheReadObject = context.get(CalculatingCacheOptimizableImpl.CONTEXT_READ_KEY);
         if (!(cacheReadObject instanceof HashMap)) {
             throw new RuntimeException("traversal of output should be an instant of HashMap");
         }
         HashMap<TreeNode<Integer>, List<Integer>> readMap = (HashMap<TreeNode<Integer>, List<Integer>>) cacheReadObject;
 
-        Object cacheWriteObject = context.get(CalculatingCacheOptimizeImpl.CONTEXT_WRITE_KEY);
+        Object cacheWriteObject = context.get(CalculatingCacheOptimizableImpl.CONTEXT_WRITE_KEY);
         if (!(cacheWriteObject instanceof HashMap)) {
             throw new RuntimeException("traversal of input should be an instant of HashMap");
         }
@@ -94,8 +94,8 @@ public class OptimizeFilterTest {
         assertTrue(readList0.get(1).equals(200));
 
         // parallel
-        assertNotNull(context.get(ParallelPruningOptimizeImpl.CONTEXT_OUTPUT_KEY));
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizeImpl.CONTEXT_OUTPUT_KEY);
+        assertNotNull(context.get(ParallelPruningOptimizableImpl.CONTEXT_OUTPUT_KEY));
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizableImpl.CONTEXT_OUTPUT_KEY);
         assertTrue(parallelPruningValueObject instanceof List);
         List<List<TreeNode<Integer>>> parallelPruningValueList = (List<List<TreeNode<Integer>>>) parallelPruningValueObject;
         assertEquals(4, parallelPruningValueList.size());
@@ -111,8 +111,8 @@ public class OptimizeFilterTest {
         assertTrue(parallelPruningValueList.get(3).contains(node0));
 
         // reverse generation
-        assertNotNull(context.get(ReverseGenerationOptimizeImpl.CONTEXT_OUTPUT_KEY));
-        Object reverseGenerationObject = context.get(ReverseGenerationOptimizeImpl.CONTEXT_OUTPUT_KEY);
+        assertNotNull(context.get(ReverseGenerationOptimizableImpl.CONTEXT_OUTPUT_KEY));
+        Object reverseGenerationObject = context.get(ReverseGenerationOptimizableImpl.CONTEXT_OUTPUT_KEY);
         assertTrue(reverseGenerationObject instanceof ConcurrentHashMap);
         ConcurrentHashMap<TreeNode<Integer>, TreeNode<Integer>> reverseGenerationMap = (ConcurrentHashMap<TreeNode<Integer>, TreeNode<Integer>>) reverseGenerationObject;
         assertEquals(5, reverseGenerationMap.size());

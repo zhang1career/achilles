@@ -1,4 +1,4 @@
-package lab.zhang.honaos.achilles.compiler.ast;
+package lab.zhang.honaos.achilles.ast;
 
 import lombok.Data;
 
@@ -30,13 +30,13 @@ public class TreeNode<V> {
             return true;
         }
 
-        for (TreeNode<V> child : children) {
-            if (child != null) {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
+//        for (TreeNode<V> child : children) {
+//            if (child != null) {
+//                return false;
+//            }
+//        }
+//        return true;
     }
 
     public void setValue(TreeNode<V> node, int index) {

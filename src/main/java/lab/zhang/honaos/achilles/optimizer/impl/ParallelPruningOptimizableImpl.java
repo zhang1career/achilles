@@ -1,8 +1,8 @@
-package lab.zhang.honaos.achilles.compiler.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl;
 
-import lab.zhang.honaos.achilles.compiler.ast.TreeNode;
-import lab.zhang.honaos.achilles.compiler.context.IContext;
-import lab.zhang.honaos.achilles.compiler.optimizer.IOptimize;
+import lab.zhang.honaos.achilles.ast.TreeNode;
+import lab.zhang.honaos.achilles.context.Contextable;
+import lab.zhang.honaos.achilles.optimizer.Optimizable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,17 +11,17 @@ import java.util.List;
 /**
  * @author zhangrj
  */
-public class ParallelPruningOptimizeImpl<V> implements IOptimize<V> {
+public class ParallelPruningOptimizableImpl<V> implements Optimizable<V> {
 
     public static final String CONTEXT_OUTPUT_KEY = "para_prune";
 
     @Override
-    public void optimize(TreeNode<V> root, IContext context) {
+    public void optimize(TreeNode<V> root, Contextable context) {
         context.put(CONTEXT_OUTPUT_KEY, Collections.synchronizedList(new ArrayList<List<TreeNode<V>>>()));
         doTravel(root, context);
     }
 
-    private int doTravel(TreeNode<V> node, IContext context) {
+    private int doTravel(TreeNode<V> node, Contextable context) {
         if (node == null) {
             return -1;
         }
