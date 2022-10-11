@@ -1,4 +1,4 @@
-package lab.zhang.honaos.achilles.executor;
+package lab.zhang.honaos.achilles.calculator;
 
 import com.sun.tools.javac.util.Pair;
 import lab.zhang.honaos.achilles.ast.TreeNode;
@@ -9,7 +9,7 @@ import lab.zhang.honaos.achilles.optimizer.impl.CalculatingCacheOptimizableImpl;
 import java.util.HashMap;
 import java.util.List;
 
-public class Executor {
+public class ElementaryCalculator {
 
     public Valuable calculate(TreeNode<Valuable> node, Contextable context) {
         Valuable result = doCalculate(node, context);

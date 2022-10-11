@@ -1,4 +1,4 @@
-package lab.zhang.honaos.achilles.executor;
+package lab.zhang.honaos.achilles.calculator;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
@@ -20,8 +20,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class ExecutorTest {
-    private Executor target;
+public class ElementaryCalculatorTest {
+    private ElementaryCalculator target;
 
     private OptimizeFilter<Valuable> optimizeFilter;
     private List<Optimizable<Valuable>> optimizerList;
@@ -39,7 +39,7 @@ public class ExecutorTest {
 
     @Before
     public void setUp() {
-        target = new Executor();
+        target = new ElementaryCalculator();
         // optimizer filter
         optimizeFilter = new OptimizeFilter<>();
         // optimizer

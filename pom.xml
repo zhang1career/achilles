@@ -14,16 +14,39 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
+        <jach.version>0.1.3.feature_nestable_channel-SNAPSHOT</jach.version>
         <lombok.version>1.18.22</lombok.version>
+        <slf4j-simple.version>1.7.30</slf4j-simple.version>
         <junit.version>4.13.2</junit.version>
     </properties>
 
 
     <dependencies>
+        <!-- util -->
+        <dependency>
+            <groupId>io.github.daichi-m</groupId>
+            <artifactId>jach</artifactId>
+            <version>${jach.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- annotation -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- log -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-simple.version}</version>
         </dependency>
 
         <!--test-->
@@ -33,6 +56,7 @@
             <scope>test</scope>
             <version>${junit.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>
