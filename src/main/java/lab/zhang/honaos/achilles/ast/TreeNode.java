@@ -1,5 +1,7 @@
 package lab.zhang.honaos.achilles.ast;
 
+
+import lab.zhang.honaos.achilles.util.UuidUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,12 +13,19 @@ import java.util.List;
 @Data
 public class TreeNode<V> {
 
+    private String uuid;
+
     private V value;
 
     private List<TreeNode<V>> children;
 
 
+    public TreeNode() {
+        this.uuid = UuidUtil.genUuid();
+    }
+
     public TreeNode(V value) {
+        this();
         this.value = value;
         this.children = new ArrayList<>();
     }
@@ -31,12 +40,6 @@ public class TreeNode<V> {
         }
 
         return false;
-//        for (TreeNode<V> child : children) {
-//            if (child != null) {
-//                return false;
-//            }
-//        }
-//        return true;
     }
 
     public void setValue(TreeNode<V> node, int index) {
@@ -49,7 +52,7 @@ public class TreeNode<V> {
             return;
         }
 
-        for(int i = children.size(); i <= level; i++) {
+        for (int i = children.size(); i <= level; i++) {
             children.add(null);
         }
     }

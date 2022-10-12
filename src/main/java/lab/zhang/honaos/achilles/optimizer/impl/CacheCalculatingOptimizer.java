@@ -1,6 +1,6 @@
 package lab.zhang.honaos.achilles.optimizer.impl;
 
-import com.sun.tools.javac.util.Pair;
+import javafx.util.Pair;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.Optimizable;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author zhangrj
  */
-public class CalculatingCacheOptimizableImpl<V> implements Optimizable<V> {
+public class CacheCalculatingOptimizer<V> implements Optimizable<V> {
 
     public static final String CONTEXT_READ_KEY = "calc_cache_read";
 

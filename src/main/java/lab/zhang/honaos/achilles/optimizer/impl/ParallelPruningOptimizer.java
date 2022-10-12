@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author zhangrj
  */
-public class ParallelPruningOptimizableImpl<V> implements Optimizable<V> {
+public class ParallelPruningOptimizer<V> implements Optimizable<V> {
 
     public static final String CONTEXT_OUTPUT_KEY = "para_prune";
 

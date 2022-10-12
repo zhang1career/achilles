@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author zhangrj
  */
-public class ReverseGenerationOptimizableImpl<V> implements Optimizable<V> {
+public class ReverseGenerationOptimizer<V> implements Optimizable<V> {
 
     public static final String CONTEXT_OUTPUT_KEY = "rev_gen";
 

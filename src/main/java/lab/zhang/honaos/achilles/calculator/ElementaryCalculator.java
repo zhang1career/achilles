@@ -1,10 +1,10 @@
 package lab.zhang.honaos.achilles.calculator;
 
-import com.sun.tools.javac.util.Pair;
+import javafx.util.Pair;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.token.Valuable;
-import lab.zhang.honaos.achilles.optimizer.impl.CalculatingCacheOptimizableImpl;
+import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,7 @@ public class ElementaryCalculator {
     }
 
     private List<Valuable> readCache(TreeNode<Valuable> node, Contextable context) {
-        Object cacheReadObject = context.get(CalculatingCacheOptimizableImpl.CONTEXT_READ_KEY);
+        Object cacheReadObject = context.get(CacheCalculatingOptimizer.CONTEXT_READ_KEY);
         if (!(cacheReadObject instanceof HashMap)) {
             throw new RuntimeException("traversal of readCache should be an instant of HashMap");
         }
@@ -35,7 +35,7 @@ public class ElementaryCalculator {
     }
 
     private void writeCache(TreeNode<Valuable> node, Contextable context, Valuable result) {
-        Object cacheWriteObject = context.get(CalculatingCacheOptimizableImpl.CONTEXT_WRITE_KEY);
+        Object cacheWriteObject = context.get(CacheCalculatingOptimizer.CONTEXT_WRITE_KEY);
         if (!(cacheWriteObject instanceof HashMap)) {
             throw new RuntimeException("traversal of writeCache should be an instant of HashMap");
         }
@@ -44,6 +44,6 @@ public class ElementaryCalculator {
         if (listIndexPair == null) {
             return;
         }
-        listIndexPair.fst.set(listIndexPair.snd, result);
+        listIndexPair.getKey().set(listIndexPair.getValue(), result);
     }
 }

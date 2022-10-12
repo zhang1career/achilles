@@ -4,9 +4,9 @@ import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.Optimizable;
 import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
-import lab.zhang.honaos.achilles.optimizer.impl.CalculatingCacheOptimizableImpl;
-import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizableImpl;
-import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizableImpl;
+import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
 import lab.zhang.honaos.achilles.token.Valuable;
 import lab.zhang.honaos.achilles.token.operand.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.Operand;
@@ -43,9 +43,9 @@ public class ElementaryCalculatorTest {
         // optimizer filter
         optimizeFilter = new OptimizeFilter<>();
         // optimizer
-        calculatingCacheOptimizer = new CalculatingCacheOptimizableImpl<>();
-        parallelPruningOptimizer = new ParallelPruningOptimizableImpl<>();
-        reverseGenerationOptimizer = new ReverseGenerationOptimizableImpl<>();
+        calculatingCacheOptimizer = new CacheCalculatingOptimizer<>();
+        parallelPruningOptimizer = new ParallelPruningOptimizer<>();
+        reverseGenerationOptimizer = new ReverseGenerationOptimizer<>();
         // optimizer link
         optimizerList = new ArrayList<>();
         optimizerList.add(calculatingCacheOptimizer);
@@ -73,7 +73,7 @@ public class ElementaryCalculatorTest {
     public void test_calculate() throws Exception {
         Contextable context = optimizeFilter.filter(node0, optimizerList);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizableImpl.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
