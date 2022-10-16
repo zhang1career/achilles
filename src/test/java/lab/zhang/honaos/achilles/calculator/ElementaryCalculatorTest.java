@@ -7,10 +7,10 @@ import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
 import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
-import lab.zhang.honaos.achilles.token.Valuable;
+import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.operand.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.Operand;
-import lab.zhang.honaos.achilles.token.operator.Addition;
+import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
 import lab.zhang.honaos.achilles.token.operator.Operator;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,15 +23,15 @@ import static org.junit.Assert.assertEquals;
 public class ElementaryCalculatorTest {
     private ElementaryCalculator target;
 
-    private OptimizeFilter<Valuable> optimizeFilter;
-    private List<Optimizable<Valuable>> optimizerList;
-    private Optimizable<Valuable> calculatingCacheOptimizer;
-    private Optimizable<Valuable> parallelPruningOptimizer;
-    private Optimizable<Valuable> reverseGenerationOptimizer;
+    private OptimizeFilter<Calculable> optimizeFilter;
+    private List<Optimizable<Calculable>> optimizerList;
+    private Optimizable<Calculable> calculatingCacheOptimizer;
+    private Optimizable<Calculable> parallelPruningOptimizer;
+    private Optimizable<Calculable> reverseGenerationOptimizer;
 
-    private TreeNode<Valuable> node0;
-    private TreeNode<Valuable> node1;
-    private TreeNode<Valuable> node2;
+    private TreeNode<Calculable> node0;
+    private TreeNode<Calculable> node1;
+    private TreeNode<Calculable> node2;
 
     private Operator operator;
     private Operand operand1;
@@ -52,7 +52,7 @@ public class ElementaryCalculatorTest {
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
         // token
-        operator = new Addition();
+        operator = new AdditionOfInteger();
         operand1 = new InstantInteger(100);
         operand2 = new InstantInteger(200);
         // tree node
@@ -77,10 +77,10 @@ public class ElementaryCalculatorTest {
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
-        List<List<TreeNode<Valuable>>> parallelPruningValueList = (List<List<TreeNode<Valuable>>>) parallelPruningValueObject;
-        Valuable result = null;
-        for (List<TreeNode<Valuable>> treeNodeList : parallelPruningValueList) {
-            for (TreeNode<Valuable> treeNode : treeNodeList) {
+        List<List<TreeNode<Calculable>>> parallelPruningValueList = (List<List<TreeNode<Calculable>>>) parallelPruningValueObject;
+        Calculable result = null;
+        for (List<TreeNode<Calculable>> treeNodeList : parallelPruningValueList) {
+            for (TreeNode<Calculable> treeNode : treeNodeList) {
                 result = target.calculate(treeNode, context);
                 System.out.println(result);
             }

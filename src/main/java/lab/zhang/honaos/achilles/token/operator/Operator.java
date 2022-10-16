@@ -1,6 +1,8 @@
 package lab.zhang.honaos.achilles.token.operator;
 
-import lab.zhang.honaos.achilles.token.Valuable;
+import lab.zhang.honaos.achilles.token.Calculable;
+import lombok.Data;
 
-abstract public class Operator implements Valuable {
+@Data
+abstract public class Operator implements Calculable {
 }

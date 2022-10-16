@@ -8,10 +8,10 @@ import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
 import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
-import lab.zhang.honaos.achilles.token.Valuable;
+import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.operand.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.Operand;
-import lab.zhang.honaos.achilles.token.operator.Addition;
+import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
 import lab.zhang.honaos.achilles.token.operator.Operator;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,15 +22,15 @@ import java.util.List;
 public class SkilledCalculatorTest {
     private SkilledCalculator target;
 
-    private OptimizeFilter<Valuable> optimizeFilter;
-    private List<Optimizable<Valuable>> optimizerList;
-    private Optimizable<Valuable> calculatingCacheOptimizer;
-    private Optimizable<Valuable> parallelPruningOptimizer;
-    private Optimizable<Valuable> reverseGenerationOptimizer;
+    private OptimizeFilter<Calculable> optimizeFilter;
+    private List<Optimizable<Calculable>> optimizerList;
+    private Optimizable<Calculable> calculatingCacheOptimizer;
+    private Optimizable<Calculable> parallelPruningOptimizer;
+    private Optimizable<Calculable> reverseGenerationOptimizer;
 
-    private TreeNode<Valuable> node0;
-    private TreeNode<Valuable> node1;
-    private TreeNode<Valuable> node2;
+    private TreeNode<Calculable> node0;
+    private TreeNode<Calculable> node1;
+    private TreeNode<Calculable> node2;
 
     private Operator operator;
     private Operand operand1;
@@ -50,7 +50,7 @@ public class SkilledCalculatorTest {
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
         // token
-        operator = new Addition();
+        operator = new AdditionOfInteger();
         operand1 = new InstantInteger(100);
         operand2 = new InstantInteger(200);
         // tree node
@@ -70,15 +70,15 @@ public class SkilledCalculatorTest {
     @Test
     public void test_calculate() throws Exception {
         Contextable context = optimizeFilter.filter(node0, optimizerList);
-        WorkerPool<TreeNode<Valuable>, Valuable> workerPool = new WorkerPool<>(SkilledCalculator.class, 2, context);
+        WorkerPool<TreeNode<Calculable>, Calculable> workerPool = new WorkerPool<>(SkilledCalculator.class, 2, context);
 
         Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
-        List<List<TreeNode<Valuable>>> parallelPruningValueList = (List<List<TreeNode<Valuable>>>) parallelPruningValueObject;
-        for (List<TreeNode<Valuable>> treeNodeList : parallelPruningValueList) {
-            List<Valuable> resultList = workerPool.layoutBlockedJobs(treeNodeList);
+        List<List<TreeNode<Calculable>>> parallelPruningValueList = (List<List<TreeNode<Calculable>>>) parallelPruningValueObject;
+        for (List<TreeNode<Calculable>> treeNodeList : parallelPruningValueList) {
+            List<Calculable> resultList = workerPool.layoutBlockedJobs(treeNodeList);
             resultList.forEach(result -> System.out.println(((InstantInteger) result).getValue()));
         }
     }

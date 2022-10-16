@@ -3,9 +3,9 @@ package lab.zhang.honaos.achilles.calculator.skill;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.calculator.ElementaryCalculator;
-import lab.zhang.honaos.achilles.token.Valuable;
+import lab.zhang.honaos.achilles.token.Calculable;
 
-public class SkilledCalculator implements Skilled<TreeNode<Valuable>, Valuable> {
+public class SkilledCalculator implements Skilled<TreeNode<Calculable>, Calculable> {
 
     private final ElementaryCalculator calculator;
 
@@ -14,7 +14,7 @@ public class SkilledCalculator implements Skilled<TreeNode<Valuable>, Valuable> 
     }
 
     @Override
-    public Valuable work(TreeNode<Valuable> input, Contextable context) {
+    public Calculable work(TreeNode<Calculable> input, Contextable context) {
         return calculator.calculate(input, context);
     }
 }

@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author zhangrj
  */
-public class ConcurrentHashMapContextableImpl implements Contextable {
+public class ConcurrentHashMapContext implements Contextable {
 
-    private Map<Object, Object> valueMap;
+    private final Map<Object, Object> valueMap;
 
-    public ConcurrentHashMapContextableImpl() {
+    public ConcurrentHashMapContext() {
         this.valueMap = new ConcurrentHashMap<>();
     }
 
