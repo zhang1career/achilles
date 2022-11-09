@@ -39,13 +39,12 @@ public class StageRoutingOptimizer<V> implements Optimizable<V> {
         if (!(stagedRouteObject instanceof ConcurrentLinkedQueue)) {
             throw new RuntimeException("staged route should be an instant of ConcurrentLinkedQueue");
         }
-        ConcurrentLinkedQueue<TreeNode<V>> stagedRouteQueue = (ConcurrentLinkedQueue<TreeNode<V>>) stagedRouteObject;
-        if (isStageable.isStageable(node, context)) {
-            stagedRouteQueue.add(node);
-        }
 
         // leaf
         if (node.isLeaf()) {
+            if (isStageable.isStageable(node, context)) {
+                stage(node, (ConcurrentLinkedQueue<TreeNode<V>>) stagedRouteObject);
+            }
             return;
         }
 
@@ -53,5 +52,13 @@ public class StageRoutingOptimizer<V> implements Optimizable<V> {
         for (TreeNode<V> child : node.getChildren()) {
             doTravel(child, context, isStageable);
         }
+        if (isStageable.isStageable(node, context)) {
+            stage(node, (ConcurrentLinkedQueue<TreeNode<V>>) stagedRouteObject);
+        }
+    }
+
+    private static <V> void stage(TreeNode<V> node, ConcurrentLinkedQueue<TreeNode<V>> stagedRouteObject) {
+        ConcurrentLinkedQueue<TreeNode<V>> stagedRouteQueue = stagedRouteObject;
+        stagedRouteQueue.add(node);
     }
 }

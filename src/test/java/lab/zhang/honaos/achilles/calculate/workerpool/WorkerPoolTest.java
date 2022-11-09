@@ -24,6 +24,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WorkerPoolTest {
     private WorkerPool target;
@@ -224,6 +228,18 @@ public class WorkerPoolTest {
         for (List<TreeNode<Calculable>> treeNodeList : parallelPruningValueList) {
             List<Calculable> resultList = target.dispatch(treeNodeList);
             resultList.forEach(result -> System.out.println(result));
+        }
+
+        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY);
+        if (!(stageRoutingObject instanceof ConcurrentLinkedQueue)) {
+            throw new RuntimeException("The stage routing should be queue");
+        }
+        ConcurrentLinkedQueue<TreeNode<Calculable>> stageRoutingQueue = (ConcurrentLinkedQueue<TreeNode<Calculable>>) stageRoutingObject;
+
+        for (TreeNode<Calculable> node : stageRoutingQueue) {
+            List<Calculable> cachedParamList = CacheCalculatingOptimizer.readCache(node, context);
+            Calculable result = node.getValue().calc(cachedParamList, context);
+            System.out.println(result);
         }
     }
 }
