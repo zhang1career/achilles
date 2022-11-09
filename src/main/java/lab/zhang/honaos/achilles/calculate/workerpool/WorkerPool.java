@@ -1,10 +1,13 @@
-package lab.zhang.honaos.achilles.calculator.worker;
+package lab.zhang.honaos.achilles.calculate.workerpool;
 
 import io.github.daichim.jach.channel.Channel;
 import io.github.daichim.jach.channel.UnbufferedChannel;
+import lab.zhang.honaos.achilles.calculate.calculator.Calculator;
+import lab.zhang.honaos.achilles.calculate.worker.Worker;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.calculator.skill.Skilled;
+import lab.zhang.honaos.achilles.calculate.workable.Workable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,17 +22,17 @@ public class WorkerPool<T, R> {
 
     private final Channel<Worker> readyWorkerChannel;
 
-    public WorkerPool(Class<? extends Skilled<T, R>> skillClazz, int poolSize, Contextable context) throws IllegalAccessException, InstantiationException {
+    public WorkerPool(Class<? extends Workable<T, R>> workableClazz, Calculator calculator, int poolSize, Contextable context) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         this.readyWorkerChannel = make(Worker.class, poolSize);
 
         for (int i = 0; i < poolSize; i++) {
-            Skilled<T, R> skill = skillClazz.newInstance();
+            Workable<T, R> workable = workableClazz.getDeclaredConstructor(Calculator.class).newInstance(calculator);
             UnbufferedChannel<T> jobChannel = (UnbufferedChannel<T>) (make(Object.class));
             UnbufferedChannel<R> resultChannel = (UnbufferedChannel<R>) (make(Object.class));
             Worker<T, R> worker = new Worker<>(jobChannel, resultChannel);
 
             go(() -> jobChannel.forEach(job -> {
-                R result = skill.work(job, context);
+                R result = workable.work(job, context);
                 resultChannel.write(result);
                 readyWorkerChannel.shallowWrite(worker);
             }));
@@ -38,20 +41,20 @@ public class WorkerPool<T, R> {
         }
     }
 
-    public UnbufferedChannel<R> layoutJob(T job) {
-        Worker<T, R> worker = readyWorkerChannel.read();
-        worker.getJobChannel().write(job);
-        return worker.getResultChannel();
-    }
-
-    public List<R> layoutBlockedJobs(Collection<T> jobs) {
+    public List<R> dispatch(Collection<T> jobs) {
         List<UnbufferedChannel<R>> resultChannelList = new ArrayList<>();
-        jobs.forEach(job -> resultChannelList.add(layoutJob(job)));
+        jobs.forEach(job -> resultChannelList.add(doDispatch(job)));
 
         List<R> resultList = new ArrayList<>();
         resultChannelList.forEach(resultChannel -> {
-            resultList.add(resultChannel.read(TIMEOUT_GET_BLOCKED_RESULT, TimeUnit.MILLISECONDS));
+            resultList.add(resultChannel.read());
         });
         return resultList;
+    }
+
+    private UnbufferedChannel<R> doDispatch(T job) {
+        Worker<T, R> worker = readyWorkerChannel.read();
+        worker.getJobChannel().write(job);
+        return worker.getResultChannel();
     }
 }

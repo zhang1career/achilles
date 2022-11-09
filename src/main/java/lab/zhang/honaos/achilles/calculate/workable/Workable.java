@@ -1,7 +1,7 @@
-package lab.zhang.honaos.achilles.calculator.skill;
+package lab.zhang.honaos.achilles.calculate.workable;
 
 import lab.zhang.honaos.achilles.context.Contextable;
 
-public interface Skilled<T, R> {
+public interface Workable<T, R> {
     R work(T job, Contextable context);
 }

@@ -1,6 +1,8 @@
-package lab.zhang.honaos.achilles.calculator;
+package lab.zhang.honaos.achilles.calculate;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
+import lab.zhang.honaos.achilles.calculate.calculator.BasicCalculator;
+import lab.zhang.honaos.achilles.calculate.calculator.Calculator;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.Optimizable;
 import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
@@ -8,10 +10,9 @@ import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
-import lab.zhang.honaos.achilles.token.operand.InstantInteger;
+import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.Operand;
 import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
-import lab.zhang.honaos.achilles.token.operator.Operator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,8 +21,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class ElementaryCalculatorTest {
-    private ElementaryCalculator target;
+public class CalculatorTest {
+    private Calculator target;
 
     private OptimizeFilter<Calculable> optimizeFilter;
     private List<Optimizable<Calculable>> optimizerList;
@@ -33,13 +34,13 @@ public class ElementaryCalculatorTest {
     private TreeNode<Calculable> node1;
     private TreeNode<Calculable> node2;
 
-    private Operator operator;
+    private AdditionOfInteger operator;
     private Operand operand1;
     private Operand operand2;
 
     @Before
     public void setUp() {
-        target = new ElementaryCalculator();
+        target = new BasicCalculator();
         // optimizer filter
         optimizeFilter = new OptimizeFilter<>();
         // optimizer
@@ -52,7 +53,7 @@ public class ElementaryCalculatorTest {
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
         // token
-        operator = new AdditionOfInteger();
+        operator = AdditionOfInteger.INSTANCE;
         operand1 = new InstantInteger(100);
         operand2 = new InstantInteger(200);
         // tree node

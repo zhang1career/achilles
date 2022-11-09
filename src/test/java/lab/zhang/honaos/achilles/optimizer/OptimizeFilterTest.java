@@ -6,6 +6,7 @@ import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.StageRoutingOptimizer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.junit.Assert.*;
 
@@ -24,6 +26,7 @@ public class OptimizeFilterTest {
     private Optimizable<Integer> calculatingCacheOptimizer;
     private Optimizable<Integer> parallelPruningOptimizer;
     private Optimizable<Integer> reverseGenerationOptimizer;
+    private Optimizable<Integer> stageRoutingOptimizer;
 
     private TreeNode<Integer> node0;
     private TreeNode<Integer> node1;
@@ -39,27 +42,29 @@ public class OptimizeFilterTest {
         calculatingCacheOptimizer = new CacheCalculatingOptimizer<>();
         parallelPruningOptimizer = new ParallelPruningOptimizer<>();
         reverseGenerationOptimizer = new ReverseGenerationOptimizer<>();
+        stageRoutingOptimizer = new StageRoutingOptimizer<>((node, context) -> node.getValue() < 0);
         // optimizer link
         optimizerList = new ArrayList<>();
         optimizerList.add(calculatingCacheOptimizer);
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
+        optimizerList.add(stageRoutingOptimizer);
         // tree node
         node0 = new TreeNode<>(0);
-        node1 = new TreeNode<>(1);
+        node1 = new TreeNode<>(-1);
         node2 = new TreeNode<>(2);
         node3 = new TreeNode<>(3);
         node4 = new TreeNode<>(4);
-        node5 = new TreeNode<>(5);
+        node5 = new TreeNode<>(-5);
         // tree
         /**
-         *     0
-         *  /     \
-         * 1       2
-         *  \     /
-         *   3   5
-         *    \
-         *     4
+         *      0
+         *   /     \
+         * (-1)    2
+         *   \     /
+         *    3  (-5)
+         *     \
+         *      4
          */
         node0.setValue(node1, 0);
         node0.setValue(node2, 1);
@@ -122,5 +127,14 @@ public class OptimizeFilterTest {
         assertEquals(reverseGenerationMap.get(node3), node1);
         assertEquals(reverseGenerationMap.get(node4), node3);
         assertEquals(reverseGenerationMap.get(node5), node2);
+
+        // stage routing
+        assertNotNull(context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY));
+        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY);
+        assertTrue(stageRoutingObject instanceof ConcurrentLinkedQueue);
+        ConcurrentLinkedQueue<TreeNode<Integer>> stageRoutingQueue = (ConcurrentLinkedQueue<TreeNode<Integer>>) stageRoutingObject;
+        assertEquals(2, stageRoutingQueue.size());
+        assertEquals(-1, stageRoutingQueue.poll().getValue().intValue());
+        assertEquals(-5, stageRoutingQueue.poll().getValue().intValue());
     }
 }

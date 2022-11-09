@@ -1,7 +1,7 @@
 package lab.zhang.honaos.achilles.ast;
 
 
-import lab.zhang.honaos.achilles.util.UuidUtil;
+import lab.zhang.zhangtool.util.UuidUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -15,19 +15,26 @@ public class TreeNode<V> {
 
     private String uuid;
 
+    private String name;
+
     private V value;
 
     private List<TreeNode<V>> children;
 
 
     public TreeNode() {
-        this.uuid = UuidUtil.genUuid();
+        this.uuid = UuidUtil.uuid();
     }
 
     public TreeNode(V value) {
         this();
         this.value = value;
         this.children = new ArrayList<>();
+    }
+
+    public TreeNode(String name, V value) {
+        this(value);
+        this.name = name;
     }
 
     public boolean isLeaf() {

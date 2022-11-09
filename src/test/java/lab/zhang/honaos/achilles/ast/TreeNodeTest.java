@@ -1,6 +1,6 @@
 package lab.zhang.honaos.achilles.ast;
 
-import lab.zhang.honaos.achilles.token.operand.InstantInteger;
+import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

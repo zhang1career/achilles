@@ -1,4 +1,4 @@
-package lab.zhang.honaos.achilles.calculator.worker;
+package lab.zhang.honaos.achilles.calculate.worker;
 
 import io.github.daichim.jach.channel.UnbufferedChannel;
 import lombok.AllArgsConstructor;

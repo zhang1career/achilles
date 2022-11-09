@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface Calculable {
     Calculable calc(List<Calculable> paramList, Contextable context);
+
+    default boolean isStageable() {
+        return false;
+    }
 }
