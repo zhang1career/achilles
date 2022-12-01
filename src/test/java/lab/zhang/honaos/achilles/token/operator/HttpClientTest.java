@@ -1,6 +1,5 @@
 package lab.zhang.honaos.achilles.token.operator;
 
-import com.sun.tools.javac.util.List;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.context.impl.ConcurrentHashMapContext;
 import lab.zhang.honaos.achilles.token.Calculable;
@@ -10,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +54,12 @@ public class HttpClientTest {
                 "If you are looking for nothing, you have found it.<br><br>\r\n" +
                 "</b>\r\n" +
                 "</body></html>\r\n\r\n";
-        Calculable result = target.calc(List.of(operand3, operand4, operand5, operand6), context);
+        ConcurrentHashMap<Integer, Calculable> argMap = new ConcurrentHashMap<>();
+        argMap.put(0, operand3);
+        argMap.put(1, operand4);
+        argMap.put(2, operand5);
+        argMap.put(3, operand6);
+        Calculable result = target.calc(argMap, context);
         assertTrue(result instanceof InstantString);
         assertEquals(compareStr, ((InstantString) result).eval(context));
     }

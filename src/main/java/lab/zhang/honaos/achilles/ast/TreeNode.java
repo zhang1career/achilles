@@ -6,6 +6,8 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangrj
@@ -19,7 +21,7 @@ public class TreeNode<V> {
 
     private V value;
 
-    private List<TreeNode<V>> children;
+    private Map<Integer, TreeNode<V>> children;
 
 
     public TreeNode() {
@@ -29,7 +31,7 @@ public class TreeNode<V> {
     public TreeNode(V value) {
         this();
         this.value = value;
-        this.children = new ArrayList<>();
+        this.children = new ConcurrentHashMap<>();
     }
 
     public TreeNode(String name, V value) {
@@ -50,17 +52,6 @@ public class TreeNode<V> {
     }
 
     public void setValue(TreeNode<V> node, int index) {
-        enlargeList(children, index);
-        children.set(index, node);
-    }
-
-    private void enlargeList(List<TreeNode<V>> children, int level) {
-        if (children.size() > level) {
-            return;
-        }
-
-        for (int i = children.size(); i <= level; i++) {
-            children.add(null);
-        }
+        children.put(index, node);
     }
 }

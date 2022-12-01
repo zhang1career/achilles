@@ -1,9 +1,10 @@
-package lab.zhang.honaos.achilles.calculate.workerpool;
+package lab.zhang.honaos.achilles.calculate.workerpool.impl;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.calculate.calculator.BasicCalculator;
 import lab.zhang.honaos.achilles.calculate.calculator.StageableCalculator;
-import lab.zhang.honaos.achilles.calculate.workable.WorkableCalculator;
+import lab.zhang.honaos.achilles.calculate.workable.impl.CalculatingWorkableImpl;
+import lab.zhang.honaos.achilles.calculate.workerpool.WorkerPool;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.Optimizable;
 import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
@@ -12,10 +13,10 @@ import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.StageRoutingOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
+import lab.zhang.honaos.achilles.token.operand.Operand;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantMap;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantString;
-import lab.zhang.honaos.achilles.token.operand.Operand;
 import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
 import lab.zhang.honaos.achilles.token.operator.HttpClient;
 import org.junit.Before;
@@ -24,12 +25,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-public class WorkerPoolTest {
+public class SelfDrivenWorkerPoolImplTest {
     private WorkerPool target;
 
     private OptimizeFilter<Calculable> optimizeFilter;
@@ -109,7 +108,7 @@ public class WorkerPoolTest {
         nodeOp0.setValue(node2, 1);
 
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new WorkerPool<>(WorkableCalculator.class, new BasicCalculator(), 2, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 2, context);
 
         Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
@@ -140,7 +139,7 @@ public class WorkerPoolTest {
         nodeOp1.setValue(node5, 2);
         nodeOp1.setValue(node6, 3);
         Contextable context = optimizeFilter.filter(nodeOp1, optimizerList);
-        target = new WorkerPool<>(WorkableCalculator.class, new BasicCalculator(), 10, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 10, context);
 
         Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
@@ -177,7 +176,7 @@ public class WorkerPoolTest {
         nodeOp1.setValue(node3, 1);
 
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new WorkerPool<>(WorkableCalculator.class, new BasicCalculator(), 2, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 2, context);
 
         Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
@@ -218,7 +217,7 @@ public class WorkerPoolTest {
         nodeOp1.setValue(node5, 2);
         nodeOp1.setValue(node6, 3);
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new WorkerPool<>(WorkableCalculator.class, new StageableCalculator(), 5, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new StageableCalculator(), 5, context);
 
         Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
@@ -237,8 +236,8 @@ public class WorkerPoolTest {
         ConcurrentLinkedQueue<TreeNode<Calculable>> stageRoutingQueue = (ConcurrentLinkedQueue<TreeNode<Calculable>>) stageRoutingObject;
 
         for (TreeNode<Calculable> node : stageRoutingQueue) {
-            List<Calculable> cachedParamList = CacheCalculatingOptimizer.readCache(node, context);
-            Calculable result = node.getValue().calc(cachedParamList, context);
+            Map<Integer, Calculable> cachedArgMap = CacheCalculatingOptimizer.readCache(node, context);
+            Calculable result = node.getValue().calc(cachedArgMap, context);
             System.out.println(result);
         }
     }

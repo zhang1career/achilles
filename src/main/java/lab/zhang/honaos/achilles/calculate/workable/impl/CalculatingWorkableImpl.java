@@ -1,15 +1,16 @@
-package lab.zhang.honaos.achilles.calculate.workable;
+package lab.zhang.honaos.achilles.calculate.workable.impl;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.calculate.calculator.Calculator;
+import lab.zhang.honaos.achilles.calculate.workable.Workable;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.token.Calculable;
 
-public class WorkableCalculator implements Workable<TreeNode<Calculable>, Calculable> {
+public class CalculatingWorkableImpl implements Workable<TreeNode<Calculable>, Calculable> {
 
     private final Calculator calculator;
 
-    public WorkableCalculator(Calculator calculator) {
+    public CalculatingWorkableImpl(Calculator calculator) {
         this.calculator = calculator;
     }
 

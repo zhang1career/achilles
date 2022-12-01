@@ -41,7 +41,11 @@ public class ParallelPruningOptimizer<V> implements Optimizable<V> {
 
         // children
         int maxLevel = 0;
-        for (TreeNode<V> child : node.getChildren()) {
+        for (int i = 0; i < node.getChildren().size(); i++) {
+            TreeNode<V> child = node.getChildren().get(i);
+            if (child == null) {
+                continue;
+            }
             int tempLevel = doTravel(child, context);
             maxLevel = Math.max(maxLevel, tempLevel);
         }

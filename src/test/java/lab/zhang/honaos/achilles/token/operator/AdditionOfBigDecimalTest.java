@@ -1,6 +1,5 @@
 package lab.zhang.honaos.achilles.token.operator;
 
-import com.sun.tools.javac.util.List;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.context.impl.ConcurrentHashMapContext;
 import lab.zhang.honaos.achilles.token.Calculable;
@@ -8,6 +7,8 @@ import lab.zhang.honaos.achilles.token.operand.instant.InstantBigDecimal;
 import lab.zhang.zhangtool.util.BigDecimalUtil;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +34,10 @@ public class AdditionOfBigDecimalTest {
 
     @Test
     public void test_additionOfInteger() throws Exception {
-        Calculable result = target.calc(List.of(op1, op2), context);
+        ConcurrentHashMap<Integer, Calculable> argMap = new ConcurrentHashMap<>();
+        argMap.put(0, op1);
+        argMap.put(1, op2);
+        Calculable result = target.calc(argMap, context);
         assertTrue(result instanceof InstantBigDecimal);
         assertEquals("10.000", BigDecimalUtil.formatWithThreeDecimals(((InstantBigDecimal) result).eval(context)));
     }

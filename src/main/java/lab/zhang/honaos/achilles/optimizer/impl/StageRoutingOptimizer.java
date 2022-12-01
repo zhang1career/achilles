@@ -49,7 +49,11 @@ public class StageRoutingOptimizer<V> implements Optimizable<V> {
         }
 
         // children
-        for (TreeNode<V> child : node.getChildren()) {
+        for (int i = 0; i < node.getChildren().size(); i++) {
+            TreeNode<V> child = node.getChildren().get(i);
+            if (child == null) {
+                continue;
+            }
             doTravel(child, context, isStageable);
         }
         if (isStageable.isStageable(node, context)) {

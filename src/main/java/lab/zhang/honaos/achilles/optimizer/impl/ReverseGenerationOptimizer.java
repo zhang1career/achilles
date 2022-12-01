@@ -38,7 +38,8 @@ public class ReverseGenerationOptimizer<V> implements Optimizable<V> {
         ConcurrentHashMap<TreeNode<V>, TreeNode<V>> traversalMap = (ConcurrentHashMap<TreeNode<V>, TreeNode<V>>) traversalObject;
 
         // children
-        for (TreeNode<V> child : node.getChildren()) {
+        for (int i = 0; i < node.getChildren().size(); i++) {
+            TreeNode<V> child = node.getChildren().get(i);
             if (child == null) {
                 continue;
             }

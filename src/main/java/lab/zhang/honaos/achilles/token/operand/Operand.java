@@ -5,12 +5,12 @@ import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.Valuable;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 abstract public class Operand<T> implements Calculable, Valuable<T> {
     @Override
-    public Calculable calc(List<Calculable> paramList, Contextable context) {
+    public Calculable calc(Map<Integer, Calculable> argMap, Contextable context) {
         return this;
     }
 }

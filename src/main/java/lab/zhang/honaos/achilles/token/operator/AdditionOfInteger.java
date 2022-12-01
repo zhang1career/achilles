@@ -5,7 +5,7 @@ import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangrj
@@ -18,9 +18,10 @@ public enum AdditionOfInteger implements Calculable {
     INSTANCE;
 
     @Override
-    public Calculable calc(List<Calculable> paramList, Contextable context) {
+    public Calculable calc(Map<Integer, Calculable> argMap, Contextable context) {
         int sum = 0;
-        for (Calculable calculable : paramList) {
+        for (int i = 0; i < argMap.size(); i++) {
+            Calculable calculable = argMap.get(i);
             if (!(calculable instanceof InstantInteger)) {
                 log.trace("The paramList should be a list of InstantInteger.");
                 return null;

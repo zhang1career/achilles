@@ -1,6 +1,5 @@
 package lab.zhang.honaos.achilles.token.operator;
 
-import com.sun.tools.javac.util.List;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.context.impl.ConcurrentHashMapContext;
 import lab.zhang.honaos.achilles.token.Calculable;
@@ -8,7 +7,10 @@ import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AdditionOfIntegerTest {
 
@@ -31,7 +33,10 @@ public class AdditionOfIntegerTest {
 
     @Test
     public void test_additionOfInteger() throws Exception {
-        Calculable result = target.calc(List.of(op1, op2), context);
+        ConcurrentHashMap<Integer, Calculable> argMap = new ConcurrentHashMap<>();
+        argMap.put(0, op1);
+        argMap.put(1, op2);
+        Calculable result = target.calc(argMap, context);
         assertTrue(result instanceof InstantInteger);
         assertEquals(3, ((InstantInteger) result).eval(context).intValue());
     }

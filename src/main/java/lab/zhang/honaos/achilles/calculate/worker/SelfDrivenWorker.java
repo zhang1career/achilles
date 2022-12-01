@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Worker<T, R> {
+public class SelfDrivenWorker<T, R> {
     private UnbufferedChannel<T> jobChannel;
     private UnbufferedChannel<R> resultChannel;
 }

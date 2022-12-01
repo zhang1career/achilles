@@ -5,7 +5,7 @@ import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantBigDecimal;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangrj
@@ -17,9 +17,11 @@ public enum AdditionOfBigDecimal implements Calculable {
     INSTANCE;
 
     @Override
-    public Calculable calc(List<Calculable> paramList, Contextable context) {
+    public Calculable calc(Map<Integer, Calculable> argMap, Contextable context) {
         BigDecimal sum = BigDecimal.valueOf(0);
-        for (Calculable calculable : paramList) {
+
+        for (int i = 0; i < argMap.size(); i++) {
+            Calculable calculable = argMap.get(i);
             if (!(calculable instanceof InstantBigDecimal)) {
                 throw new IllegalArgumentException("The paramList should be a list of InstantBigDecimal.");
             }

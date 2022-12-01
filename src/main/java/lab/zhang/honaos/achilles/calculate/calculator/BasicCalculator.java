@@ -5,7 +5,7 @@ import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
 
-import java.util.List;
+import java.util.Map;
 
 public class BasicCalculator extends AbstractCalculator {
 
@@ -13,8 +13,8 @@ public class BasicCalculator extends AbstractCalculator {
         if (node.isLeaf()) {
             return node.getValue().calc(null, context);
         }
-        List<Calculable> cachedParamList = CacheCalculatingOptimizer.readCache(node, context);
-        return node.getValue().calc(cachedParamList, context);
+        Map<Integer, Calculable> cachedParamValueMap = CacheCalculatingOptimizer.readCache(node, context);
+        return node.getValue().calc(cachedParamValueMap, context);
     }
 
 }
