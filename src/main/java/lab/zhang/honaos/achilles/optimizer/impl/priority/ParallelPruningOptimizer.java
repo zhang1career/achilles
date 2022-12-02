@@ -1,8 +1,9 @@
-package lab.zhang.honaos.achilles.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl.priority;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.Optimizable;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,13 +12,14 @@ import java.util.List;
 /**
  * @author zhangrj
  */
-public class ParallelPruningOptimizer<V> implements Optimizable<V> {
+public class ParallelPruningOptimizer<V> extends PriorityOptimizer<V> {
 
-    public static final String CONTEXT_OUTPUT_KEY = "para_prune";
+    @Getter
+    private final int priorityValue = 200;
 
     @Override
     public void optimize(TreeNode<V> root, Contextable context) {
-        context.put(CONTEXT_OUTPUT_KEY, Collections.synchronizedList(new ArrayList<List<TreeNode<V>>>()));
+        context.put(CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY, Collections.synchronizedList(new ArrayList<List<TreeNode<V>>>()));
         doTravel(root, context);
     }
 
@@ -27,7 +29,7 @@ public class ParallelPruningOptimizer<V> implements Optimizable<V> {
         }
 
         // retrieve data from the context
-        Object valueObject = context.get(CONTEXT_OUTPUT_KEY);
+        Object valueObject = context.get(CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(valueObject instanceof List)) {
             throw new RuntimeException("traversal value should be an instant of List");
         }

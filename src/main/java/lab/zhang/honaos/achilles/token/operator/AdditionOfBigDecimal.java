@@ -21,11 +21,11 @@ public enum AdditionOfBigDecimal implements Calculable {
         BigDecimal sum = BigDecimal.valueOf(0);
 
         for (int i = 0; i < argMap.size(); i++) {
-            Calculable calculable = argMap.get(i);
-            if (!(calculable instanceof InstantBigDecimal)) {
-                throw new IllegalArgumentException("The paramList should be a list of InstantBigDecimal.");
+            Calculable arg = argMap.get(i);
+            if (!(arg instanceof InstantBigDecimal)) {
+                throw new IllegalArgumentException("The argument should be an instance of InstantBigDecimal.");
             }
-            sum = sum.add(((InstantBigDecimal) calculable).eval(context));
+            sum = sum.add(((InstantBigDecimal) arg).eval(context));
         }
         return new InstantBigDecimal(sum);
     }

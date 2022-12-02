@@ -21,12 +21,12 @@ public enum AdditionOfInteger implements Calculable {
     public Calculable calc(Map<Integer, Calculable> argMap, Contextable context) {
         int sum = 0;
         for (int i = 0; i < argMap.size(); i++) {
-            Calculable calculable = argMap.get(i);
-            if (!(calculable instanceof InstantInteger)) {
-                log.trace("The paramList should be a list of InstantInteger.");
+            Calculable arg = argMap.get(i);
+            if (!(arg instanceof InstantInteger)) {
+                log.trace("The argument should be an instance of InstantInteger.");
                 return null;
             }
-            sum += ((InstantInteger) calculable).eval(context);
+            sum += ((InstantInteger) arg).eval(context);
         }
         return new InstantInteger(sum);
     }

@@ -4,8 +4,6 @@ package lab.zhang.honaos.achilles.ast;
 import lab.zhang.zhangtool.util.UuidUtil;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,7 +49,7 @@ public class TreeNode<V> {
         return false;
     }
 
-    public void setValue(TreeNode<V> node, int index) {
+    public void setChild(int index, TreeNode<V> node) {
         children.put(index, node);
     }
 }

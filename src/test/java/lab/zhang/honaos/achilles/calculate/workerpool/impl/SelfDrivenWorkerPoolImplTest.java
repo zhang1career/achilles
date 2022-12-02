@@ -6,12 +6,12 @@ import lab.zhang.honaos.achilles.calculate.calculator.StageableCalculator;
 import lab.zhang.honaos.achilles.calculate.workable.impl.CalculatingWorkableImpl;
 import lab.zhang.honaos.achilles.calculate.workerpool.WorkerPool;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.Optimizable;
 import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
-import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.StageRoutingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.CacheCalculatingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ParallelPruningOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ReverseGenerationOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.StageRoutingOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
 import lab.zhang.honaos.achilles.token.operand.Operand;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
@@ -32,11 +32,11 @@ public class SelfDrivenWorkerPoolImplTest {
     private WorkerPool target;
 
     private OptimizeFilter<Calculable> optimizeFilter;
-    private List<Optimizable<Calculable>> optimizerList;
-    private Optimizable<Calculable> calculatingCacheOptimizer;
-    private Optimizable<Calculable> parallelPruningOptimizer;
-    private Optimizable<Calculable> reverseGenerationOptimizer;
-    private Optimizable<Calculable> stageRoutingOptimizer;
+    private List<PriorityOptimizer<Calculable>> optimizerList;
+    private PriorityOptimizer<Calculable> calculatingCacheOptimizer;
+    private PriorityOptimizer<Calculable> parallelPruningOptimizer;
+    private PriorityOptimizer<Calculable> reverseGenerationOptimizer;
+    private PriorityOptimizer<Calculable> stageRoutingOptimizer;
 
     private TreeNode<Calculable> nodeOp0;
     private TreeNode<Calculable> nodeOp1;
@@ -104,13 +104,13 @@ public class SelfDrivenWorkerPoolImplTest {
          *  /     \
          * 1       2
          */
-        nodeOp0.setValue(node1, 0);
-        nodeOp0.setValue(node2, 1);
+        nodeOp0.setChild(0, node1);
+        nodeOp0.setChild(1, node2);
 
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 2, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 10, context);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
@@ -134,14 +134,14 @@ public class SelfDrivenWorkerPoolImplTest {
          *  3   4   5   6
          * GET HTTP url (value, 3)
          */
-        nodeOp1.setValue(node3, 0);
-        nodeOp1.setValue(node4, 1);
-        nodeOp1.setValue(node5, 2);
-        nodeOp1.setValue(node6, 3);
+        nodeOp1.setChild(0, node3);
+        nodeOp1.setChild(1, node4);
+        nodeOp1.setChild(2, node5);
+        nodeOp1.setChild(3, node6);
         Contextable context = optimizeFilter.filter(nodeOp1, optimizerList);
         target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 10, context);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
@@ -170,15 +170,15 @@ public class SelfDrivenWorkerPoolImplTest {
          *      /     \
          *     2       3
          */
-        nodeOp0.setValue(node1, 0);
-        nodeOp0.setValue(nodeOp1, 1);
-        nodeOp1.setValue(node2, 0);
-        nodeOp1.setValue(node3, 1);
+        nodeOp0.setChild(0, node1);
+        nodeOp0.setChild(1, nodeOp1);
+        nodeOp1.setChild(0, node2);
+        nodeOp1.setChild(1, node3);
 
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 2, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new BasicCalculator(), 10, context);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
@@ -209,17 +209,17 @@ public class SelfDrivenWorkerPoolImplTest {
          *  3   4   5   6
          * GET HTTP url (value, 3)
          */
-        nodeOp0.setValue(node1, 0);
-        nodeOp0.setValue(node2, 1);
-        nodeOp0.setValue(nodeOp1, 2);
-        nodeOp1.setValue(node3, 0);
-        nodeOp1.setValue(node4, 1);
-        nodeOp1.setValue(node5, 2);
-        nodeOp1.setValue(node6, 3);
+        nodeOp0.setChild(0, node1);
+        nodeOp0.setChild(1, node2);
+        nodeOp0.setChild(2, nodeOp1);
+        nodeOp1.setChild(0, node3);
+        nodeOp1.setChild(1, node4);
+        nodeOp1.setChild(2, node5);
+        nodeOp1.setChild(3, node6);
         Contextable context = optimizeFilter.filter(nodeOp0, optimizerList);
-        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new StageableCalculator(), 5, context);
+        target = new SelfDrivenWorkerPoolImpl<>(CalculatingWorkableImpl.class, new StageableCalculator(), 10, context);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }
@@ -229,7 +229,7 @@ public class SelfDrivenWorkerPoolImplTest {
             resultList.forEach(result -> System.out.println(result));
         }
 
-        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY);
+        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_STAGE_ROUTING_OUTPUT_KEY);
         if (!(stageRoutingObject instanceof ConcurrentLinkedQueue)) {
             throw new RuntimeException("The stage routing should be queue");
         }

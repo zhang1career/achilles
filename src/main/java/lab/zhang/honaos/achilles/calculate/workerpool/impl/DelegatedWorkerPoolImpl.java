@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 
 public class DelegatedWorkerPoolImpl<T, R> implements WorkerPool<T, R> {
 
-    private static final int WAIT_TIMEOUT = 1;
+    private static final int WAIT_TIMEOUT = 1000;
 
     private final ExecutorService workerThreadPool;
 
@@ -27,7 +27,7 @@ public class DelegatedWorkerPoolImpl<T, R> implements WorkerPool<T, R> {
     public DelegatedWorkerPoolImpl(Class<? extends Workable<T, R>> workableClazz, Class<? extends Calculator> calculatorClazz, int poolSize, Contextable context) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         this.workerThreadPool = new ThreadPoolExecutor(
                 poolSize, poolSize,
-                1000L, TimeUnit.MILLISECONDS,
+                10L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
                 new NamedThreadFactory("ach-calc-worker-pool", false));
 
@@ -45,9 +45,9 @@ public class DelegatedWorkerPoolImpl<T, R> implements WorkerPool<T, R> {
             workerThreadPool.submit(() -> {
                 T job = jobs.get(finalI);
 
-                Workable<T, R> workable = null;
                 try {
-                    workable = workableConstructor.newInstance(calculator);
+                    Workable<T, R> workable = workableConstructor.newInstance(calculator);
+                    workable.work(job, context);
                 } catch (InstantiationException e) {
                     throw new RuntimeException(e);
                 } catch (IllegalAccessException e) {
@@ -57,12 +57,12 @@ public class DelegatedWorkerPoolImpl<T, R> implements WorkerPool<T, R> {
                 } finally {
                     countDownLatch.countDown();
                 }
-                R result = workable.work(job, context);
             });
         }
 
         boolean await;
         try {
+//            countDownLatch.await();
             await = countDownLatch.await(WAIT_TIMEOUT, TimeUnit.MILLISECONDS);
             if (!await) {
                 throw new TimeoutException(String.format("The countDownLatch is not finished in %d milli-seconds", WAIT_TIMEOUT));

@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ParseService {
@@ -28,8 +28,10 @@ public class ParseService {
             return token;
         }
 
-        List<TreeNode> childTokenList = new ArrayList<>();
-        for (Object childCond : (JSONArray) token.getValue()) {
+        Map<Integer, TreeNode> childTokenMap = new ConcurrentHashMap<>();
+        JSONArray childrenCond = (JSONArray) token.getValue();
+        for (int i = 0; i < childrenCond.size(); i++) {
+            Object childCond = childrenCond.get(i);
             if (childCond == null) {
                 continue;
             }
@@ -37,9 +39,9 @@ public class ParseService {
             if (condStr.isEmpty()) {
                 continue;
             }
-            childTokenList.add(parse(condStr));
+            childTokenMap.put(i, parse(condStr));
         }
-        token.setValue(childTokenList);
+        token.setChildren(childTokenMap);
 
         return token;
     }

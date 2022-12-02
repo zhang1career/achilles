@@ -5,9 +5,15 @@ import lab.zhang.honaos.achilles.context.Contextable;
 
 public interface Optimizable<V> {
 
-    void optimize(TreeNode<V> root, Contextable context);
+    String CONTEXT_CACHE_CALCULATING_READ_KEY = "cc_read";
 
-    default Object getOptimizeInfo() {
-        throw new UnsupportedOperationException("This method should have been specified before use.");
-    }
+    String CONTEXT_CACHE_CALCULATING_WRITE_KEY = "cc_write";
+
+    String CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY = "para_prune";
+
+    String CONTEXT_REVERSE_GENERATION_OUTPUT_KEY = "rev_gen";
+
+    String CONTEXT_STAGE_ROUTING_OUTPUT_KEY = "stg_route";
+
+    void optimize(TreeNode<V> root, Contextable context);
 }

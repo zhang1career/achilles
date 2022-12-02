@@ -2,7 +2,7 @@ package lab.zhang.honaos.achilles.calculate.calculator;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.CacheCalculatingOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
 
 import java.util.Map;

@@ -3,10 +3,11 @@ package lab.zhang.honaos.achilles.optimizer;
 import javafx.util.Pair;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.StageRoutingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.CacheCalculatingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ParallelPruningOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ReverseGenerationOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.StageRoutingOptimizer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,11 +23,11 @@ public class OptimizeFilterTest {
 
     private OptimizeFilter<Integer> target;
 
-    private List<Optimizable<Integer>> optimizerList;
-    private Optimizable<Integer> calculatingCacheOptimizer;
-    private Optimizable<Integer> parallelPruningOptimizer;
-    private Optimizable<Integer> reverseGenerationOptimizer;
-    private Optimizable<Integer> stageRoutingOptimizer;
+    private List<PriorityOptimizer<Integer>> optimizerList;
+    private PriorityOptimizer<Integer> calculatingCacheOptimizer;
+    private PriorityOptimizer<Integer> parallelPruningOptimizer;
+    private PriorityOptimizer<Integer> reverseGenerationOptimizer;
+    private PriorityOptimizer<Integer> stageRoutingOptimizer;
 
     private TreeNode<Integer> node0;
     private TreeNode<Integer> node1;
@@ -66,11 +67,11 @@ public class OptimizeFilterTest {
          *     \
          *      4
          */
-        node0.setValue(node1, 0);
-        node0.setValue(node2, 1);
-        node1.setValue(node3, 1);
-        node3.setValue(node4, 1);
-        node2.setValue(node5, 0);
+        node0.setChild(0, node1);
+        node0.setChild(1, node2);
+        node1.setChild(1, node3);
+        node3.setChild(1, node4);
+        node2.setChild(0, node5);
     }
 
     @Test
@@ -78,13 +79,13 @@ public class OptimizeFilterTest {
         Contextable context = target.filter(node0, optimizerList);
 
         // calculating cache
-        Object cacheReadObject = context.get(CacheCalculatingOptimizer.CONTEXT_READ_KEY);
+        Object cacheReadObject = context.get(CacheCalculatingOptimizer.CONTEXT_CACHE_CALCULATING_READ_KEY);
         if (!(cacheReadObject instanceof HashMap)) {
             throw new RuntimeException("traversal of output should be an instant of HashMap");
         }
         HashMap<TreeNode<Integer>, List<Integer>> readMap = (HashMap<TreeNode<Integer>, List<Integer>>) cacheReadObject;
 
-        Object cacheWriteObject = context.get(CacheCalculatingOptimizer.CONTEXT_WRITE_KEY);
+        Object cacheWriteObject = context.get(CacheCalculatingOptimizer.CONTEXT_CACHE_CALCULATING_WRITE_KEY);
         if (!(cacheWriteObject instanceof HashMap)) {
             throw new RuntimeException("traversal of input should be an instant of HashMap");
         }
@@ -99,8 +100,8 @@ public class OptimizeFilterTest {
         assertTrue(readList0.get(1).equals(200));
 
         // parallel
-        assertNotNull(context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY));
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        assertNotNull(context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY));
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         assertTrue(parallelPruningValueObject instanceof List);
         List<List<TreeNode<Integer>>> parallelPruningValueList = (List<List<TreeNode<Integer>>>) parallelPruningValueObject;
         assertEquals(4, parallelPruningValueList.size());
@@ -116,8 +117,8 @@ public class OptimizeFilterTest {
         assertTrue(parallelPruningValueList.get(3).contains(node0));
 
         // reverse generation
-        assertNotNull(context.get(ReverseGenerationOptimizer.CONTEXT_OUTPUT_KEY));
-        Object reverseGenerationObject = context.get(ReverseGenerationOptimizer.CONTEXT_OUTPUT_KEY);
+        assertNotNull(context.get(ReverseGenerationOptimizer.CONTEXT_REVERSE_GENERATION_OUTPUT_KEY));
+        Object reverseGenerationObject = context.get(ReverseGenerationOptimizer.CONTEXT_REVERSE_GENERATION_OUTPUT_KEY);
         assertTrue(reverseGenerationObject instanceof ConcurrentHashMap);
         ConcurrentHashMap<TreeNode<Integer>, TreeNode<Integer>> reverseGenerationMap = (ConcurrentHashMap<TreeNode<Integer>, TreeNode<Integer>>) reverseGenerationObject;
         assertEquals(5, reverseGenerationMap.size());
@@ -129,8 +130,8 @@ public class OptimizeFilterTest {
         assertEquals(reverseGenerationMap.get(node5), node2);
 
         // stage routing
-        assertNotNull(context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY));
-        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_OUTPUT_KEY);
+        assertNotNull(context.get(StageRoutingOptimizer.CONTEXT_STAGE_ROUTING_OUTPUT_KEY));
+        Object stageRoutingObject = context.get(StageRoutingOptimizer.CONTEXT_STAGE_ROUTING_OUTPUT_KEY);
         assertTrue(stageRoutingObject instanceof ConcurrentLinkedQueue);
         ConcurrentLinkedQueue<TreeNode<Integer>> stageRoutingQueue = (ConcurrentLinkedQueue<TreeNode<Integer>>) stageRoutingObject;
         assertEquals(2, stageRoutingQueue.size());

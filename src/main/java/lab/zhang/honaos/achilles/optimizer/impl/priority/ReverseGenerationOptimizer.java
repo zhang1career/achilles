@@ -1,24 +1,25 @@
-package lab.zhang.honaos.achilles.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl.priority;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.Optimizable;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lombok.Getter;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangrj
  */
-public class ReverseGenerationOptimizer<V> implements Optimizable<V> {
+public class ReverseGenerationOptimizer<V> extends PriorityOptimizer<V> {
 
-    public static final String CONTEXT_OUTPUT_KEY = "rev_gen";
+    @Getter
+    private final int priorityValue = 300;
 
     @Override
     public void optimize(TreeNode<V> root, Contextable context) {
-        context.put(CONTEXT_OUTPUT_KEY, new ConcurrentHashMap<TreeNode<V>, TreeNode<V>>());
+        context.put(CONTEXT_REVERSE_GENERATION_OUTPUT_KEY, new ConcurrentHashMap<TreeNode<V>, TreeNode<V>>());
         doTravel(root, context);
     }
-
 
     private void doTravel(TreeNode<V> node, Contextable context) {
         if (node == null) {
@@ -31,7 +32,7 @@ public class ReverseGenerationOptimizer<V> implements Optimizable<V> {
         }
 
         // retrieve data from the context
-        Object traversalObject = context.get(CONTEXT_OUTPUT_KEY);
+        Object traversalObject = context.get(CONTEXT_REVERSE_GENERATION_OUTPUT_KEY);
         if (!(traversalObject instanceof ConcurrentHashMap)) {
             throw new RuntimeException("traversal should be an instant of ConcurrentHashMap");
         }

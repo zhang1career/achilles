@@ -4,14 +4,14 @@ import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.calculate.calculator.BasicCalculator;
 import lab.zhang.honaos.achilles.calculate.calculator.Calculator;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.Optimizable;
 import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
-import lab.zhang.honaos.achilles.optimizer.impl.CacheCalculatingOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ParallelPruningOptimizer;
-import lab.zhang.honaos.achilles.optimizer.impl.ReverseGenerationOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.CacheCalculatingOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ParallelPruningOptimizer;
+import lab.zhang.honaos.achilles.optimizer.impl.priority.ReverseGenerationOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
-import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.Operand;
+import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +25,10 @@ public class CalculatorTest {
     private Calculator target;
 
     private OptimizeFilter<Calculable> optimizeFilter;
-    private List<Optimizable<Calculable>> optimizerList;
-    private Optimizable<Calculable> calculatingCacheOptimizer;
-    private Optimizable<Calculable> parallelPruningOptimizer;
-    private Optimizable<Calculable> reverseGenerationOptimizer;
+    private List<PriorityOptimizer<Calculable>> optimizerList;
+    private PriorityOptimizer<Calculable> calculatingCacheOptimizer;
+    private PriorityOptimizer<Calculable> parallelPruningOptimizer;
+    private PriorityOptimizer<Calculable> reverseGenerationOptimizer;
 
     private TreeNode<Calculable> node0;
     private TreeNode<Calculable> node1;
@@ -66,15 +66,15 @@ public class CalculatorTest {
          *  /     \
          * 1       2
          */
-        node0.setValue(node1, 0);
-        node0.setValue(node2, 1);
+        node0.setChild(0, node1);
+        node0.setChild(1, node2);
     }
 
     @Test
     public void test_calculate() throws Exception {
         Contextable context = optimizeFilter.filter(node0, optimizerList);
 
-        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_OUTPUT_KEY);
+        Object parallelPruningValueObject = context.get(ParallelPruningOptimizer.CONTEXT_PARALLEL_PRUNING_OUTPUT_KEY);
         if (!(parallelPruningValueObject instanceof List)) {
             throw new RuntimeException("The parallel pruned should be list");
         }

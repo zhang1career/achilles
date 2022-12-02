@@ -1,17 +1,19 @@
-package lab.zhang.honaos.achilles.optimizer.impl;
+package lab.zhang.honaos.achilles.optimizer.impl.priority;
 
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
-import lab.zhang.honaos.achilles.optimizer.Optimizable;
+import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
+import lombok.Getter;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * @author zhangrj
  */
-public class StageRoutingOptimizer<V> implements Optimizable<V> {
+public class StageRoutingOptimizer<V> extends PriorityOptimizer<V> {
 
-    public static final String CONTEXT_OUTPUT_KEY = "stg_route";
+    @Getter
+    private final int priorityValue = 400;
 
     public static interface IsStageable<V> {
         boolean isStageable(TreeNode<V> node, Contextable context);
@@ -25,7 +27,7 @@ public class StageRoutingOptimizer<V> implements Optimizable<V> {
 
     @Override
     public void optimize(TreeNode<V> root, Contextable context) {
-        context.put(CONTEXT_OUTPUT_KEY, new ConcurrentLinkedQueue<TreeNode<V>>());
+        context.put(CONTEXT_STAGE_ROUTING_OUTPUT_KEY, new ConcurrentLinkedQueue<TreeNode<V>>());
         doTravel(root, context, isStageable);
     }
 
@@ -35,7 +37,7 @@ public class StageRoutingOptimizer<V> implements Optimizable<V> {
         }
 
         // retrieve data from the context
-        Object stagedRouteObject = context.get(CONTEXT_OUTPUT_KEY);
+        Object stagedRouteObject = context.get(CONTEXT_STAGE_ROUTING_OUTPUT_KEY);
         if (!(stagedRouteObject instanceof ConcurrentLinkedQueue)) {
             throw new RuntimeException("staged route should be an instant of ConcurrentLinkedQueue");
         }
