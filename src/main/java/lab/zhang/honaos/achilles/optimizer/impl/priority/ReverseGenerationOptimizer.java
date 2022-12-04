@@ -32,11 +32,7 @@ public class ReverseGenerationOptimizer<V> extends PriorityOptimizer<V> {
         }
 
         // retrieve data from the context
-        Object traversalObject = context.get(CONTEXT_REVERSE_GENERATION_OUTPUT_KEY);
-        if (!(traversalObject instanceof ConcurrentHashMap)) {
-            throw new RuntimeException("traversal should be an instant of ConcurrentHashMap");
-        }
-        ConcurrentHashMap<TreeNode<V>, TreeNode<V>> traversalMap = (ConcurrentHashMap<TreeNode<V>, TreeNode<V>>) traversalObject;
+        ConcurrentHashMap<TreeNode<V>, TreeNode<V>> traversalMap = getReverseGenerationMap(context);
 
         // children
         for (int i = 0; i < node.getChildren().size(); i++) {
@@ -47,5 +43,18 @@ public class ReverseGenerationOptimizer<V> extends PriorityOptimizer<V> {
             traversalMap.put(child, node);
             doTravel(child, context);
         }
+    }
+
+    private static <V> ConcurrentHashMap<TreeNode<V>, TreeNode<V>> getReverseGenerationMap(Contextable context) {
+        Object traversalObject = context.get(CONTEXT_REVERSE_GENERATION_OUTPUT_KEY);
+        if (!(traversalObject instanceof ConcurrentHashMap)) {
+            throw new RuntimeException("traversal should be an instant of ConcurrentHashMap");
+        }
+        return (ConcurrentHashMap<TreeNode<V>, TreeNode<V>>) traversalObject;
+    }
+
+    public static <V> TreeNode<V> getParentNode(TreeNode<V> node, Contextable context) {
+        ConcurrentHashMap<TreeNode<V>, TreeNode<V>> traversalMap = getReverseGenerationMap(context);
+        return traversalMap.get(node);
     }
 }

@@ -5,6 +5,7 @@ import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.context.Contextable;
 import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
 import lab.zhang.honaos.achilles.token.Calculable;
+import lab.zhang.honaos.achilles.token.Valuable;
 import lombok.Getter;
 
 import java.util.Map;
@@ -17,28 +18,6 @@ public class CacheCalculatingOptimizer<V> extends PriorityOptimizer<V> {
 
     @Getter
     private final int priorityValue = 100;
-
-    public static Map<Integer, Calculable> readCache(TreeNode<Calculable> node, Contextable context) {
-        Object cacheReadObject = context.get(CONTEXT_CACHE_CALCULATING_READ_KEY);
-        if (!(cacheReadObject instanceof Map)) {
-            throw new RuntimeException("traversal of readCache should be an instant of Map");
-        }
-        Map<TreeNode<Calculable>, Map<Integer, Calculable>> readMap = (Map<TreeNode<Calculable>, Map<Integer, Calculable>>) cacheReadObject;
-        return readMap.get(node);
-    }
-
-    public static void writeCache(TreeNode<Calculable> node, Contextable context, Calculable result) {
-        Object cacheWriteObject = context.get(CONTEXT_CACHE_CALCULATING_WRITE_KEY);
-        if (!(cacheWriteObject instanceof Map)) {
-            throw new RuntimeException("traversal of writeCache should be an instant of Map");
-        }
-        Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>> writeMap = (ConcurrentHashMap<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>>) cacheWriteObject;
-        Pair<Map<Integer, Calculable>, Integer> mapIndexPair = writeMap.get(node);
-        if (mapIndexPair == null) {
-            return;
-        }
-        mapIndexPair.getKey().put(mapIndexPair.getValue(), result);
-    }
 
     @Override
     public void optimize(TreeNode<V> root, Contextable context) {
@@ -87,5 +66,39 @@ public class CacheCalculatingOptimizer<V> extends PriorityOptimizer<V> {
 
     private Map<Integer, V> initMap(int size) {
         return new ConcurrentHashMap<>(size);
+    }
+
+
+    public static Map<Integer, Calculable> readCache(TreeNode<Calculable> node, Contextable context) {
+        Object cacheReadObject = context.get(CONTEXT_CACHE_CALCULATING_READ_KEY);
+        if (!(cacheReadObject instanceof Map)) {
+            throw new RuntimeException("traversal of readCache should be an instant of Map");
+        }
+        Map<TreeNode<Calculable>, Map<Integer, Calculable>> readMap = (Map<TreeNode<Calculable>, Map<Integer, Calculable>>) cacheReadObject;
+        return readMap.get(node);
+    }
+
+    public static void writeCache(TreeNode<Calculable> node, Contextable context, Calculable result) {
+        Object cacheWriteObject = context.get(CONTEXT_CACHE_CALCULATING_WRITE_KEY);
+        if (!(cacheWriteObject instanceof Map)) {
+            throw new RuntimeException("traversal of writeCache should be an instant of Map");
+        }
+        Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>> writeMap = (ConcurrentHashMap<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>>) cacheWriteObject;
+        Pair<Map<Integer, Calculable>, Integer> mapIndexPair = writeMap.get(node);
+        if (mapIndexPair == null) {
+            return;
+        }
+        mapIndexPair.getKey().put(mapIndexPair.getValue(), result);
+    }
+
+    public static Object getResult(TreeNode<Calculable> node, Contextable context) {
+        Map<Integer, Calculable> calculableMap = readCache(node, context);
+        Calculable resultObj = calculableMap.get(0);
+        if (!(resultObj instanceof Valuable)) {
+            throw new RuntimeException("The result should be Valuable");
+        }
+        Valuable resultValue = (Valuable) resultObj;
+        Object valueObj = resultValue.eval(context);
+        return valueObj;
     }
 }

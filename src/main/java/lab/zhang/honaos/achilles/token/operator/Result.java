@@ -10,7 +10,7 @@ import java.util.Map;
  * @author zhangrj
  */
 @Slf4j
-public enum ArgGetter implements Calculable {
+public enum Result implements Calculable {
     /**
      * singleton
      */
@@ -18,12 +18,10 @@ public enum ArgGetter implements Calculable {
 
     @Override
     public Calculable calc(Map<Integer, Calculable> argMap, Contextable context) {
-        //todo get x from argMap
         Calculable arg = argMap.get(0);
         if (arg == null) {
             log.trace("The argument is not found.");
-            return null;
         }
-        return arg.calc(argMap, context);
+        return null;
     }
 }

@@ -3,6 +3,7 @@ package lab.zhang.honaos.achilles.calculate.workerpool.impl;
 import javafx.util.Pair;
 import lab.zhang.honaos.achilles.ast.TreeNode;
 import lab.zhang.honaos.achilles.calculate.calculator.BasicCalculator;
+import lab.zhang.honaos.achilles.calculate.calculator.Calculator;
 import lab.zhang.honaos.achilles.calculate.calculator.StageableCalculator;
 import lab.zhang.honaos.achilles.calculate.workable.impl.CalculatingWorkableImpl;
 import lab.zhang.honaos.achilles.calculate.workerpool.WorkerPool;
@@ -12,21 +13,17 @@ import lab.zhang.honaos.achilles.optimizer.OptimizeFilter;
 import lab.zhang.honaos.achilles.optimizer.impl.PriorityOptimizer;
 import lab.zhang.honaos.achilles.optimizer.impl.priority.*;
 import lab.zhang.honaos.achilles.token.Calculable;
-import lab.zhang.honaos.achilles.token.Valuable;
 import lab.zhang.honaos.achilles.token.operand.Operand;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantInteger;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantMap;
 import lab.zhang.honaos.achilles.token.operand.instant.InstantString;
 import lab.zhang.honaos.achilles.token.operator.AdditionOfInteger;
-import lab.zhang.honaos.achilles.token.operator.ArgGetter;
+import lab.zhang.honaos.achilles.token.operator.Result;
 import lab.zhang.honaos.achilles.token.operator.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -35,7 +32,7 @@ public class DelegatedWorkerPoolImplTest {
 
     private OptimizeFilter<Calculable> optimizeFilter;
     private List<PriorityOptimizer<Calculable>> optimizerList;
-    private PriorityOptimizer<Calculable> calculatingCacheOptimizer;
+    private PriorityOptimizer<Calculable> cacheCalculatingOptimizer;
     private PriorityOptimizer<Calculable> parallelPruningOptimizer;
     private PriorityOptimizer<Calculable> reverseGenerationOptimizer;
     private PriorityOptimizer<Calculable> stageRoutingOptimizer;
@@ -68,14 +65,14 @@ public class DelegatedWorkerPoolImplTest {
         // optimizer filter
         optimizeFilter = new OptimizeFilter<>();
         // optimizer
-        calculatingCacheOptimizer = new CacheCalculatingOptimizer<>();
+        cacheCalculatingOptimizer = new CacheCalculatingOptimizer<>();
         parallelPruningOptimizer = new ParallelPruningOptimizer<>();
         reverseGenerationOptimizer = new ReverseGenerationOptimizer<>();
         stageRoutingOptimizer = new StageRoutingOptimizer<>((node, context) -> node.getValue().isStageable());
         resultGetterOptimizer = new ResultValueOptimizer<>();
         // optimizer link
         optimizerList = new ArrayList<>();
-        optimizerList.add(calculatingCacheOptimizer);
+        optimizerList.add(cacheCalculatingOptimizer);
         optimizerList.add(parallelPruningOptimizer);
         optimizerList.add(reverseGenerationOptimizer);
         optimizerList.add(stageRoutingOptimizer);
@@ -96,6 +93,7 @@ public class DelegatedWorkerPoolImplTest {
         operand8 = new InstantMap(new HashMap<>());
     }
 
+
     /***************************************************
      * single operator under test
      **************************************************/
@@ -113,7 +111,7 @@ public class DelegatedWorkerPoolImplTest {
         nodeOp0.setChild(1, node2);
 
         // root prepare
-        Calculable dummyOperator = ArgGetter.INSTANCE;
+        Calculable dummyOperator = Result.INSTANCE;
         TreeNode<Calculable> nodeDummy = new TreeNode<>(dummyOperator);
         nodeDummy.setChild(0, nodeOp0);
 
@@ -129,15 +127,7 @@ public class DelegatedWorkerPoolImplTest {
             target.dispatch(treeNodeList);
         }
 
-        Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>> writeMap = (Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>>) context.get(Optimizable.CONTEXT_CACHE_CALCULATING_WRITE_KEY);
-        Pair<Map<Integer, Calculable>, Integer> resultPair = writeMap.get(nodeDummy);
-
-        Object resultObj = resultPair.getKey().get(resultPair.getValue());
-        if (!(resultObj instanceof Valuable)) {
-            throw new RuntimeException("The result should be Valuable");
-        }
-        Valuable resultValue = (Valuable) resultObj;
-        Object valueObj = resultValue.eval(context);
+        Object valueObj = CacheCalculatingOptimizer.getResult(nodeDummy, context);
         if (!(valueObj instanceof Integer)) {
             throw new RuntimeException("The result should be Integer");
         }
@@ -164,7 +154,7 @@ public class DelegatedWorkerPoolImplTest {
         nodeOp1.setChild(3, node6);
 
         // root prepare
-        Calculable dummyOperator = ArgGetter.INSTANCE;
+        Calculable dummyOperator = Result.INSTANCE;
         TreeNode<Calculable> nodeDummy = new TreeNode<>(dummyOperator);
         nodeDummy.setChild(0, nodeOp1);
 
@@ -209,7 +199,7 @@ public class DelegatedWorkerPoolImplTest {
         nodeOp1.setChild(1, node3);
 
         // root prepare
-        Calculable dummyOperator = ArgGetter.INSTANCE;
+        Calculable dummyOperator = Result.INSTANCE;
         TreeNode<Calculable> nodeDummy = new TreeNode<>(dummyOperator);
         nodeDummy.setChild(0, nodeOp0);
 
@@ -225,15 +215,7 @@ public class DelegatedWorkerPoolImplTest {
             target.dispatch(treeNodeList);
         }
 
-        Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>> writeMap = (Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>>) context.get(Optimizable.CONTEXT_CACHE_CALCULATING_WRITE_KEY);
-        Pair<Map<Integer, Calculable>, Integer> resultPair = writeMap.get(nodeDummy);
-
-        Object resultObj = resultPair.getKey().get(resultPair.getValue());
-        if (!(resultObj instanceof Valuable)) {
-            throw new RuntimeException("The result should be Valuable");
-        }
-        Valuable resultValue = (Valuable) resultObj;
-        Object valueObj = resultValue.eval(context);
+        Object valueObj = CacheCalculatingOptimizer.getResult(nodeDummy, context);
         if (!(valueObj instanceof Integer)) {
             throw new RuntimeException("The result should be Integer");
         }
@@ -270,7 +252,7 @@ public class DelegatedWorkerPoolImplTest {
         nodeOp1.setChild(3, node6);
 
         // root prepare
-        Calculable dummyOperator = ArgGetter.INSTANCE;
+        Calculable dummyOperator = Result.INSTANCE;
         TreeNode<Calculable> nodeDummy = new TreeNode<>(dummyOperator);
         nodeDummy.setChild(0, nodeOp0);
 
@@ -286,8 +268,31 @@ public class DelegatedWorkerPoolImplTest {
             target.dispatch(treeNodeList);
         }
 
-        Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>> writeMap = (Map<TreeNode<Calculable>, Pair<Map<Integer, Calculable>, Integer>>) context.get(Optimizable.CONTEXT_CACHE_CALCULATING_WRITE_KEY);
-        Pair<Map<Integer, Calculable>, Integer> resultPair = writeMap.get(nodeDummy);
-        System.out.println(resultPair.getKey().get(resultPair.getValue()));
+        Calculator calculator = new BasicCalculator();
+        Collection<TreeNode<Calculable>> stageNodes = StageRoutingOptimizer.getStageNodes(context);
+        for (TreeNode<Calculable> node : stageNodes) {
+            TreeNode<Calculable> parentNode = node;
+            while (parentNode != null) {
+                calculator.calculate(parentNode, context);
+                parentNode = ReverseGenerationOptimizer.getParentNode(parentNode, context);
+            }
+            // root
+            if (true) {
+                break;
+            }
+        }
+
+        Object valueObj = CacheCalculatingOptimizer.getResult(nodeDummy, context);
+        if (!(valueObj instanceof Integer)) {
+            throw new RuntimeException("The result should be Integer");
+        }
+        Integer value = (Integer) valueObj;
+        assertEquals(500, (int) value);
     }
+
+
+    /***************************************************
+     * thread safety test
+     **************************************************/
+
 }

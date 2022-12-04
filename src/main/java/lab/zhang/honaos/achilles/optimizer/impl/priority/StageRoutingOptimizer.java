@@ -15,10 +15,6 @@ public class StageRoutingOptimizer<V> extends PriorityOptimizer<V> {
     @Getter
     private final int priorityValue = 400;
 
-    public static interface IsStageable<V> {
-        boolean isStageable(TreeNode<V> node, Contextable context);
-    }
-
     private final IsStageable<V> isStageable;
 
     public StageRoutingOptimizer(IsStageable<V> isStageable) {
@@ -37,15 +33,12 @@ public class StageRoutingOptimizer<V> extends PriorityOptimizer<V> {
         }
 
         // retrieve data from the context
-        Object stagedRouteObject = context.get(CONTEXT_STAGE_ROUTING_OUTPUT_KEY);
-        if (!(stagedRouteObject instanceof ConcurrentLinkedQueue)) {
-            throw new RuntimeException("staged route should be an instant of ConcurrentLinkedQueue");
-        }
+        ConcurrentLinkedQueue<TreeNode<V>> stageRouteQueue = getStageNodes(context);
 
         // leaf
         if (node.isLeaf()) {
             if (isStageable.isStageable(node, context)) {
-                stage(node, (ConcurrentLinkedQueue<TreeNode<V>>) stagedRouteObject);
+                stage(node, stageRouteQueue);
             }
             return;
         }
@@ -59,12 +52,24 @@ public class StageRoutingOptimizer<V> extends PriorityOptimizer<V> {
             doTravel(child, context, isStageable);
         }
         if (isStageable.isStageable(node, context)) {
-            stage(node, (ConcurrentLinkedQueue<TreeNode<V>>) stagedRouteObject);
+            stage(node, stageRouteQueue);
         }
     }
 
-    private static <V> void stage(TreeNode<V> node, ConcurrentLinkedQueue<TreeNode<V>> stagedRouteObject) {
-        ConcurrentLinkedQueue<TreeNode<V>> stagedRouteQueue = stagedRouteObject;
+    private void stage(TreeNode<V> node, ConcurrentLinkedQueue<TreeNode<V>> stagedRouteQueue) {
         stagedRouteQueue.add(node);
+    }
+
+    public static interface IsStageable<V> {
+        boolean isStageable(TreeNode<V> node, Contextable context);
+    }
+
+    public static <V> ConcurrentLinkedQueue<TreeNode<V>> getStageNodes(Contextable context) {
+        Object stageRouteObject = context.get(CONTEXT_STAGE_ROUTING_OUTPUT_KEY);
+        if (!(stageRouteObject instanceof ConcurrentLinkedQueue)) {
+            throw new RuntimeException("stage route should be an instant of ConcurrentLinkedQueue");
+        }
+        ConcurrentLinkedQueue<TreeNode<V>> stageRouteQueue = (ConcurrentLinkedQueue<TreeNode<V>>) stageRouteObject;
+        return stageRouteQueue;
     }
 }
